@@ -1,9 +1,40 @@
 nelmio_api_doc:
     documentation:
         info:
-            title: Symfony example App.
-            description: API for authors and books.
+            title: Пример приложения на Symfony 5.2.
+            description: API для книг и авторов.
             version: 1.0.0
+        components:
+            schemas:
+                Book:
+                    description: Книга.
+                    type: object
+                    required:
+                        - name
+                    properties:
+                        id:
+                            title: Идентификатор книги
+                            type: integer
+                            example: 42
+                        name:
+                            title: Название книги
+                            type: string
+                            example: Война и мир
+                Author:
+                    description: Автор.
+                    type: object
+                    required:
+                        - name
+                    properties:
+                        id:
+                            title: Идентификатор автора
+                            type: integer
+                            example: 42
+                        name:
+                            title: Имя автора
+                            type: string
+                            example: Иванов Иван
     areas:
         path_patterns:
             - ^/api/doc.json$
+            - /books/

@@ -72,11 +72,11 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         foreach (self::BOOK_ONE as $ruBookOne => $enBookOne) {
-            foreach (self::BOOK_TWO as $ruTwoItem => $enTwoItem) {
-                foreach (self::BOOK_THREE as $ruThreeItem => $enThreeItem) {
+            foreach (self::BOOK_TWO as $ruBookTwo => $enBookTwo) {
+                foreach (self::BOOK_THREE as $ruBookThree => $enBookThree) {
                     $book = new Book();
-                    $book->translate('ru')->setName($ruBookOne . ' и ' . $ruTwoItem . ', ' . $ruThreeItem);
-                    $book->translate('en')->setName($enTwoItem . ' и ' . $enTwoItem . ', ' . $enTwoItem);
+                    $book->translate('ru')->setName($ruBookOne . ' и ' . $ruBookTwo . ', ' . $ruBookThree);
+                    $book->translate('en')->setName($enBookOne . ' и ' . $enBookTwo . ', ' . $enBookThree);
                     $manager->persist($book);
                     $book->mergeNewTranslations();
                 }

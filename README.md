@@ -32,6 +32,8 @@ composer req symfony/security-bundle
 composer req knplabs/doctrine-behaviors
 composer req nelmio/api-doc-bundle
 composer req twig asset
-composer require symfony/maker-bundle --dev
-composer require --dev orm-fixtures
+composer req symfony/maker-bundle --dev
+composer req --dev orm-fixtures
+composer req symfony/translation
+composer req symfony/serializer
 ```

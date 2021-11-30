@@ -8,8 +8,9 @@ use Knp\DoctrineBehaviors\Model\Translatable\TranslatableTrait;
 
 /**
  * @ORM\Entity
+ * @method string getName()
  */
-class Book implements TranslatableInterface
+class Book implements TranslatableInterface, \JsonSerializable
 {
     use TranslatableTrait;
 
@@ -39,5 +40,13 @@ class Book implements TranslatableInterface
     public function setId(int $id): void
     {
         $this->id = $id;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->translate($this->getCurrentLocale())->getName(),
+        ];
     }
 }
