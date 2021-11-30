@@ -5,7 +5,7 @@
 - PHP 7.4
 - Symfony 5.2
 
-# Запуск приложения
+## Запуск приложения
 
 1. Скопировать `.env.local.distrib` в `.env.local`.
 2. Если необходимо, отредактировать `.env.local`. По умолчанию, редактирование не нужно.
@@ -17,4 +17,17 @@
 
 # Для основки с очисткой
 > make down-clear
+```
+
+## Log composer пакетов
+
+Для symfony 5.2 необходимо соблюдать последовательность, иначе крашится.
+
+```
+composer create-project symfony/skeleton:"5.2.*" my_app
+cd my_app
+composer req doctrine/dbal "2.*"
+composer req symfony/orm-pack
+composer req symfony/security-bundle
+composer req knplabs/doctrine-behaviors
 ```
