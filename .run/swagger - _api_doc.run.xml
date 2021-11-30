@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="swagger - /api/doc" type="PhpWebAppRunConfigurationType" factoryName="PHP Web Application" server_name="Docker" start_url="/api/doc">
+    <method v="2" />
+  </configuration>
+</component>

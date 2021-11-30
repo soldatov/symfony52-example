@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+
+  phpfpm:
+    container_name: symfony52-example-php
+    image: symfony52-example-php
+    build:
+      context: ./docker-files/dev/php
+    env_file:
+      - .env.local
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+
+  nginx:
+    container_name: symfony52-example-nginx
+    image: symfony52-example-nginx
+    build:
+      context: docker-files/dev/nginx
+    env_file:
+      - .env.local
+    ports:
+      - 80:80
+    depends_on:
+      - phpfpm
+    volumes:
+      - .:/app
+      - ./var/log/nginx:/var/log/nginx
+      - ./docker-files/dev/nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+  postgres:
+    container_name: symfony52-example-postgres
+    image: symfony52-example-postgres
+    build:
+      context: docker-files/dev/postgres
+    env_file:
+      - .env.local
+    ports:
+      - 5432:5432
+    volumes:
+      - volume_pgdata:/pgdata
+volumes:
+    volume_pgdata:
