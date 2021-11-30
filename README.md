@@ -30,4 +30,6 @@ composer req doctrine/dbal "2.*"
 composer req symfony/orm-pack
 composer req symfony/security-bundle
 composer req knplabs/doctrine-behaviors
+composer req nelmio/api-doc-bundle
+composer req twig asset
 ```
