@@ -24,6 +24,10 @@ make up-first
 make down-clear
 ```
 
+## Реализованы Методы:
+- `GET /api/doc.json` - Open API спецификация.
+- `/{locale}/books/{id}` - Получение книги по id (пока без авторов).
+
 ## Log composer пакетов
 
 Для symfony 5.2 необходимо соблюдать последовательность, иначе крашится.
