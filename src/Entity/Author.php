@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslationInterface;
 use Knp\DoctrineBehaviors\Model\Translatable\TranslatableTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 /**
  * @ORM\Entity
@@ -20,6 +22,10 @@ class Author implements TranslatableInterface
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
+     * @Groups({"book:get"})
+     *
+     * @var int
      */
     private int $id = 0;
 
@@ -42,5 +48,16 @@ class Author implements TranslatableInterface
     public function setId(int $id): void
     {
         $this->id = $id;
+    }
+
+    /**
+     * @Groups({"book:get"})
+     * @SerializedName("name")
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->translate($this->getCurrentLocale())->getName();
     }
 }

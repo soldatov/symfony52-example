@@ -34,6 +34,16 @@ nelmio_api_doc:
                             title: Имя автора
                             type: string
                             example: Иванов Иван
+                Error:
+                    description: Ошибка.
+                    type: object
+                    required:
+                        - message
+                    properties:
+                        message:
+                            title: Описание ошибки
+                            type: string
+                            example: Books not found
     areas:
         path_patterns:
             - ^/api/doc.json$

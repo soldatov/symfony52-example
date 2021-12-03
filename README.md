@@ -47,4 +47,5 @@ composer req --dev orm-fixtures
 composer req symfony/translation
 composer req symfony/serializer
 composer req denismitr/translit
+composer req sensio/framework-extra-bundle
 ```
