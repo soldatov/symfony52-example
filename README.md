@@ -46,4 +46,5 @@ composer req symfony/maker-bundle --dev
 composer req --dev orm-fixtures
 composer req symfony/translation
 composer req symfony/serializer
+composer req denismitr/translit
 ```

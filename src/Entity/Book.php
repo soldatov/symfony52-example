@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Knp\DoctrineBehaviors\Model\Translatable\TranslatableTrait;
 
@@ -20,6 +22,15 @@ class Book implements TranslatableInterface, \JsonSerializable
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private int $id = 0;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Author::class)
+     * @ORM\JoinTable(name="book_author",
+     *   joinColumns={@ORM\JoinColumn(name="book_id", referencedColumnName="id")},
+     *   inverseJoinColumns={@ORM\JoinColumn(name="author_id", referencedColumnName="id")}
+     * )
+     */
+    private PersistentCollection $authors;
 
     public function __construct()
     {
@@ -40,6 +51,22 @@ class Book implements TranslatableInterface, \JsonSerializable
     public function setId(int $id): void
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return PersistentCollection
+     */
+    public function getAuthors(): PersistentCollection
+    {
+        return $this->authors;
+    }
+
+    /**
+     * @param PersistentCollection $authors
+     */
+    public function setAuthors(PersistentCollection $authors): void
+    {
+        $this->authors = $authors;
     }
 
     public function jsonSerialize(): array

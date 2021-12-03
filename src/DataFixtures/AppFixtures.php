@@ -2,8 +2,12 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Author;
 use App\Entity\Book;
+use Denismitr\Translit\Translit;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\Persistence\ObjectManager;
 
 class AppFixtures extends Fixture
@@ -69,8 +73,114 @@ class AppFixtures extends Fixture
         'электронная версия' => 'electronic version',
     ];
 
+    private const AUTHOR_NAMES = [
+        'Александр',
+        'Сергей',
+        'Владимир',
+        'Андрей',
+        'Алексей',
+        'Николай',
+        'Иван',
+        'Дмитрий',
+        'Михаил',
+        'Евгений',
+        'Виктор',
+        'Юрий',
+        'Василий',
+        'Игорь',
+        'Анатолий',
+        'Олег',
+        'Павел',
+        'Максим',
+        'Виталий',
+        'Валерий',
+        'Роман',
+        'Денис',
+        'Константин',
+        'Вячеслав',
+        'Владислав',
+        'Вадим',
+        'Глеб',
+        'Матвей',
+    ];
+
+    private const AUTHOR_MIDDLE_NAMES = [
+        'Олегович',
+        'Орестович',
+        'Павлович',
+        'Памфилович',
+        'Панкратович',
+        'Абрамович',
+        'Агапович',
+        'Адамович',
+        'Альбертович',
+        'Богданович',
+        'Вадимович',
+        'Валерианович',
+        'Валериевич',
+        'Владимирович',
+        'Геннадиевич',
+        'Германович',
+        'Глебович',
+        'Григорьевич',
+        'Давидович',
+        'Далматович',
+        'Демидович',
+        'Добрынич',
+        'Егорович',
+        'Еремеевич',
+        'Ефремович',
+        'Львович',
+        'Ларионович',
+        'Логвинович',
+        'Маратович',
+        'Маркович',
+        'Матвеевич',
+        'Мирославович',
+        'Назарович',
+        'Никитич',
+        'Самсонович',
+    ];
+
+    private const AUTHOR_FAMILY = [
+        'Смирнов',
+        'Иванов',
+        'Кузнецов',
+        'Соколов',
+        'Попов',
+        'Лебедев',
+        'Козлов',
+        'Новиков',
+        'Морозов',
+        'Петров',
+        'Волков',
+        'Соловьёв',
+        'Васильев',
+        'Зайцев',
+        'Павлов',
+        'Семёнов',
+        'Голубев',
+        'Виноградов',
+        'Богданов',
+        'Воробьёв',
+        'Фёдоров',
+        'Михайлов',
+        'Беляев',
+        'Тарасов',
+        'Белов',
+        'Комаров',
+        'Орлов',
+        'Киселёв',
+        'Макаров',
+        'Андреев',
+    ];
+
     public function load(ObjectManager $manager): void
     {
+        $manager->getConnection()->getConfiguration()->setSQLLogger(null);
+
+        $i = 0;
+
         foreach (self::BOOK_ONE as $ruBookOne => $enBookOne) {
             foreach (self::BOOK_TWO as $ruBookTwo => $enBookTwo) {
                 foreach (self::BOOK_THREE as $ruBookThree => $enBookThree) {
@@ -79,8 +189,87 @@ class AppFixtures extends Fixture
                     $book->translate('en')->setName($enBookOne . ' и ' . $enBookTwo . ', ' . $enBookThree);
                     $manager->persist($book);
                     $book->mergeNewTranslations();
+
+                    if (++$i >= 500) {
+                        $manager->flush();
+                        $manager->clear();
+                        $i = 0;
+                    }
                 }
             }
+        }
+
+        $manager->flush();
+        $manager->clear();
+
+        $i = 0;
+
+        $translit = new Translit();
+
+        foreach (self::AUTHOR_NAMES as $authorNameItem) {
+            foreach (self::AUTHOR_MIDDLE_NAMES as $authorMiddleItem) {
+                foreach (self::AUTHOR_FAMILY as $authorFamilyItem) {
+                    $name = $authorNameItem . ' ' . $authorMiddleItem . ' ' . $authorFamilyItem;
+                    $nameEn = ucwords(
+                        $translit->transform($authorNameItem) . ' '
+                        . $translit->transform($authorMiddleItem) . ' '
+                        . $translit->transform($authorFamilyItem)
+                    );
+
+                    $author = new Author();
+                    $author->translate('ru')->setName($name);
+                    $author->translate('en')->setName($nameEn);
+                    $manager->persist($author);
+                    $author->mergeNewTranslations();
+
+                    if (++$i >= 500) {
+                        $manager->flush();
+                        $manager->clear();
+                        $i = 0;
+                    }
+                }
+            }
+        }
+
+        $manager->flush();
+        $manager->clear();
+
+        $authorsIds = array_map(
+            function ($item) {
+                /** @var Author $item */
+
+                return $item->getId();
+            },
+            $manager->getRepository(Author::class)->findAll()
+        );
+
+        $books = $manager->getRepository(Book::class)->findAll();
+        /** @var Book[] $books */
+
+        $i = 1;
+        foreach ($books as $book) {
+
+            for ($ii = 1; $ii <= $i; $ii++) {
+                $authorID = array_shift($authorsIds);
+                $author = $manager->getRepository(Author::class)->find($authorID);
+                $book->getAuthors()->add($author);
+            }
+
+            $i++;
+
+            if ($i >= 4) {
+                $i = 1;
+            }
+        }
+
+        $manager->flush();
+
+        $author42 = $manager->getRepository(Author::class)->find(42);
+
+        foreach ([42, 142, 242, 342, 442, 542, 642, 742, 1042, 1142, 1242, 1342, 1442, 1542, 1642, 1742] as $item) {
+            $book = $manager->getRepository(Book::class)->find($item);
+            /** @var Book $book */
+            $book->getAuthors()->add($author42);
         }
 
         $manager->flush();
