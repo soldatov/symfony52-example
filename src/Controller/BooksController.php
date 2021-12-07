@@ -4,11 +4,15 @@ namespace App\Controller;
 
 use App\Entity\Book;
 use App\Response\JsonNotFoundResponse;
+use App\Serializer\AuthorDenormalizer;
+use App\Serializer\BookDenormalizer;
+use App\Serializer\CustomDenormalizerInterface;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Annotations as API;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
@@ -41,13 +45,17 @@ class BooksController extends AbstractController
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
         $this->serializer = new Serializer(
-            [new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory))],
+            [
+                new BookDenormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory)),
+                new AuthorDenormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory)),
+                new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory)),
+            ],
             [JsonEncoder::FORMAT => new JsonEncoder()]
         );
     }
 
     /**
-     * @Route("{_locale}/books/{id<\d+>}", name="books_get", methods={"GET"})
+     * @Route("{_locale}/book/{id<\d+>}", name="books_get", methods={"GET"})
      *
      * @API\Get(
      *   description="Получить книгу",
@@ -95,5 +103,46 @@ class BooksController extends AbstractController
             JsonEncoder::FORMAT,
             [AbstractNormalizer::GROUPS => ['book:get']]
         ));
+    }
+
+    /**
+     * @Route("/book", name="books_add", methods={"POST"})
+     *
+     * @API\Post(
+     *   description="Добавить книгу",
+     *   operationId="addBook",
+     *
+     *   @API\RequestBody(
+     *     description="Локализованный объект книги.",
+     *     @API\MediaType(
+     *       mediaType="application/json",
+     *       @API\Schema(ref="#/components/schemas/LocalizedBook")
+     *     )
+     *   ),
+     *
+     *   @API\Response(
+     *     response=200,
+     *     description="Успешное добавление книги",
+     *     @API\JsonContent(ref="#/components/schemas/SuccessAddBook"),
+     *   ),
+     * )
+     * */
+    public function addBook(Request $request)
+    {
+        $json = $request->getContent();
+        $decoded = $this->serializer->decode($json, JsonEncoder::FORMAT);
+
+        $book = $this->serializer->denormalize($decoded, Book::class, CustomDenormalizerInterface::FORMAT, [
+            AbstractNormalizer::GROUPS => ['book:add']
+        ]);
+        /** @var Book $book */
+
+        foreach ($book->getAuthors() as $author) {
+            $this->em->persist($author);
+        }
+        $this->em->persist($book);
+        $this->em->flush();
+
+        return new JsonResponse(['bookId' => $book->getId()]);
     }
 }

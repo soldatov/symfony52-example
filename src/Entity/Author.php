@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslationInterface;
@@ -59,5 +58,21 @@ class Author implements TranslatableInterface
     public function getName(): string
     {
         return $this->translate($this->getCurrentLocale())->getName();
+    }
+
+    /**
+     * @Groups({"book:add"})
+     * */
+    public function setName(string $name): void
+    {
+        $this->translate($this->getCurrentLocale())->setName($name);
+    }
+
+    /**
+     * @Groups({"book:add"})
+     * */
+    public function setCurrentLocale(string $locale): void
+    {
+        $this->currentLocale = $locale;
     }
 }

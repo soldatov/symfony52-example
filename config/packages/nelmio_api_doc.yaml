@@ -20,6 +20,23 @@ nelmio_api_doc:
                             title: Название книги
                             type: string
                             example: Война и мир
+                        authors:
+                            title: Авторы
+                            type: array
+                            items:
+                                $ref: "#/components/schemas/Author"
+                LocalizedBook:
+                    description: Объект книги на нескольких языках.
+                    type: object
+                    properties:
+                        ru:
+                            title: Книга на русском языке
+                            type: object
+                            $ref: "#/components/schemas/Book"
+                        en:
+                            title: Книга на английском языке
+                            type: object
+                            $ref: "#/components/schemas/Book"
                 Author:
                     description: Автор.
                     type: object
@@ -34,6 +51,17 @@ nelmio_api_doc:
                             title: Имя автора
                             type: string
                             example: Иванов Иван
+                SuccessAddBook:
+                    description: Успешное добавление книги.
+                    type: object
+                    required:
+                        - bookId
+                    properties:
+                        bookId:
+                            title: Идентификатор книги
+                            type: integer
+                            example: 42
+
                 Error:
                     description: Ошибка.
                     type: object
@@ -47,4 +75,4 @@ nelmio_api_doc:
     areas:
         path_patterns:
             - ^/api/doc.json$
-            - /books/
+            - /book

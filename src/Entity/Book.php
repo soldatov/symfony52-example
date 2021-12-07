@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\PersistentCollection;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslationInterface;
 use Knp\DoctrineBehaviors\Model\Translatable\TranslatableTrait;
@@ -36,13 +37,14 @@ class Book implements TranslatableInterface
      *   inverseJoinColumns={@ORM\JoinColumn(name="author_id", referencedColumnName="id")}
      * )
      *
-     * @var Author[]|PersistentCollection $authors
+     * @var Author[]|Collection $authors
      */
-    private PersistentCollection $authors;
+    private Collection $authors;
 
     public function __construct()
     {
         $this->setDefaultLocale('ru');
+        $this->authors = new ArrayCollection();
     }
 
     /**
@@ -73,21 +75,39 @@ class Book implements TranslatableInterface
     }
 
     /**
+     * @Groups({"book:add"})
+     * */
+    public function setName(string $name): void
+    {
+        $this->translate($this->getCurrentLocale())->setName($name);
+    }
+
+    /**
      * @Groups({"book:get"})
      * @SerializedName("authors")
      *
-     * @return Author[]|PersistentCollection
+     * @return Author[]|Collection
      */
-    public function getAuthors(): PersistentCollection
+    public function getAuthors(): Collection
     {
         return $this->authors;
     }
 
     /**
-     * @param PersistentCollection $authors
+     * @Groups({"book:add"})
+     *
+     * @param Collection $authors
      */
-    public function setAuthors(PersistentCollection $authors): void
+    public function setAuthors(Collection $authors): void
     {
         $this->authors = $authors;
+    }
+
+    /**
+     * @Groups({"book:add"})
+     * */
+    public function setCurrentLocale(string $locale): void
+    {
+        $this->currentLocale = $locale;
     }
 }
